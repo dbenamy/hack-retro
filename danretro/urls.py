@@ -20,6 +20,6 @@ from main import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('', views.index),
-    path('static/<str:path>', views.static),
+    path("", views.index),
+    path("static/<str:path>", views.static),
 ]

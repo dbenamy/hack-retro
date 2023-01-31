@@ -16,7 +16,7 @@ from django.core.asgi import get_asgi_application
 
 import main.routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'danretro.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "danretro.settings")
 
 # application = get_asgi_application()
 application = ProtocolTypeRouter(

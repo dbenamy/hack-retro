@@ -10,6 +10,7 @@ from channels.generic.websocket import WebsocketConsumer
 GROUPING_WORKSPACE_HEIGHT = 1000
 GROUPING_WORKSPACE_WIDTH = 1500
 
+
 @dataclass
 class Topic:
     text: str
@@ -37,6 +38,8 @@ class Retro:
         for t in self.topics:
             if t.text == text:
                 return t
+        raise Exception("No such topic")
+
 
 # TODO gc old ones
 retros = {}
@@ -105,7 +108,9 @@ class ChatConsumer(WebsocketConsumer):
                 )
         elif retro.state == "brainstorming":
             if action["type"] == "addTopic":
-                topic = Topic(text=action["text"], feeling=action["list"], x=0, y=0, cluster=None)
+                topic = Topic(
+                    text=action["text"], feeling=action["list"], x=0, y=0, cluster=None
+                )
                 retro.topics.append(topic)
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name,
