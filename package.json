@@ -1,0 +1,17 @@
+{
+  "name": "hack-retro",
+  "version": "0.1.0",
+  "main": "main.js",
+  "repository": "git@github.com:dbenamy/hack-retro.git",
+  "author": "Daniel Benamy <daniel@benamy.info>",
+  "license": "GPL3",
+  "private": false,
+  "devDependencies": {
+    "eslint": "^8.0.1",
+    "eslint-config": "^0.3.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0"
+  }
+}
