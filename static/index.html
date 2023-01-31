@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Dan's Retro</title>
+</head>
+<body>
+    <div id="loading">Loading...</div>
+    <div class="view" id="joining-view" hidden=true>
+        People in the retro:<br>
+        <textarea id="participants" cols="100" rows="20"></textarea><br>
+        Please enter your name:<br>
+        <input id="name" type="text" size="100"><br>
+        <input id="join" type="button" value="Join"><br>
+        <input id="start" type="button" value="Start">
+    </div>
+    <div class="view" id="brainstorming-view" hidden=true>
+        <table>
+            <tr>
+                <th>Happy</th><th>Sad</th><th>Confused</th>
+            </tr>
+            <tr>
+                <td>
+                    <textarea id="happy-list" cols="50" rows="50"></textarea><br>
+                </td>
+                <td>
+                    <textarea id="sad-list" cols="50" rows="50"></textarea><br>
+                </td>
+                <td>
+                    <textarea id="confused-list" cols="50" rows="50"></textarea><br>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input id="happy-item" size="50"><input id="happy-add" type="button" value="Add"><br>
+                </td>
+                <td>
+                    <input id="sad-item" size="50"><input id="sad-add" type="button" value="Add"><br>
+                </td>
+                <td>
+                    <input id="confused-item" size="50"><input id="confused-add" type="button" value="Add"><br>
+                </td>
+            </tr>
+        </table>
+        <!-- TODO right align the next button: -->
+        <input id="go-to-grouping" type="button" value="Continue to Grouping">
+    </div>
+    <!-- Keep workspace dimensions in sync with server-side constants -->
+    <div class="view" id="grouping-view" hidden=true>
+        <div
+            id="grouping-workspace"
+            style="border: 2px solid black; height: 1000px; width: 1500px;"
+            ondragenter="dragenterHandler(event)"
+            ondragover="dragoverHandler(event)"
+            ondrop="dropHandler(event)"
+        >
+        </div>
+        <input id="go-to-voting" type="button" value="Done">
+    </div>
+    <div class="view" id="voting-view" hidden=true>
+        <!-- <input id="go-to-voting" type="button" value="Done"> -->
+    </div>
+</body>
+<script src="/static/main.js"></script>
+</html>
