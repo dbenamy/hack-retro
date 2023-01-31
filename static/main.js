@@ -331,6 +331,7 @@ function moveTopicActionHandler(action) {
 		if (div) {
 			div.style.left = action.x + "px";
 			div.style.top = action.y + "px";
+			updateClustering(div);
 		} else {
 			log.error(`Got a move action for an unknown topic: {action.text}`);
 		}
