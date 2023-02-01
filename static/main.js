@@ -353,10 +353,6 @@ function dropHandler (event) {
 document.querySelector('#go-to-voting').onclick = function (e) {
   assignAllTopicsACluster()
   const topicsByCluster = getTopicByCluster(clustersByTopic)
-  for (const cluster in topicsByCluster) {
-    console.log(`cluster ${cluster}: ${topicsByCluster[cluster]}`)
-  }
-
   chatSocket.send(JSON.stringify({
     type: 'goToVoting',
     clusters: Object.values(topicsByCluster)
@@ -453,7 +449,6 @@ function createVotingClusterUi(clusterId, topics) {
   voteUp.onclick = function (e) {
     e.preventDefault()
     if (votes.length < 3) {
-      console.log("Increasing vote for cluster " + clusterId)
       voteCounter++
       votes.push(clusterId)
     }
