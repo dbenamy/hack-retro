@@ -3,7 +3,7 @@ let userName = null
 function init (action) {
   let state = action.state
   if (!userName) {
-    state = "joining"
+    state = 'joining'
   }
 
   for (const div of document.querySelectorAll('.view')) {
@@ -392,15 +392,15 @@ const votes = []
 
 function initVoting (action) {
   const topicsByClusterId = {}
-  for (let cluster of action.clusters) {
+  for (const cluster of action.clusters) {
     topicsByClusterId[cluster.id] = []
-    for (let topicText of cluster.topics) {
+    for (const topicText of cluster.topics) {
       topicsByClusterId[cluster.id].push(topicText)
     }
   }
 
   const votingClusters = document.querySelector('#voting-clusters')
-  for (let cid in topicsByClusterId) {
+  for (const cid in topicsByClusterId) {
     votingClusters.appendChild(createVotingClusterUi(cid, topicsByClusterId[cid]))
   }
 
@@ -424,7 +424,7 @@ function initVoting (action) {
   }
 }
 
-function createVotingClusterUi(clusterId, topics) {
+function createVotingClusterUi (clusterId, topics) {
   const table = document.createElement('table')
   table.style.cssText = 'border: 2px solid black; margin: 5px; border-collapse: collapse;'
   for (const t of topics) {
@@ -439,15 +439,15 @@ function createVotingClusterUi(clusterId, topics) {
 
   let voteCounter = 0
   const voteCountView = document.createElement('span')
-  voteCountView.style.margin = "3px"
-  function updateVoteCounter() {
+  voteCountView.style.margin = '3px'
+  function updateVoteCounter () {
     voteCountView.innerText = `${voteCounter}`
   }
   updateVoteCounter()
 
   const voteDown = document.createElement('input')
-  voteDown.type = "button"
-  voteDown.value = "-"
+  voteDown.type = 'button'
+  voteDown.value = '-'
   voteDown.onclick = function (e) {
     e.preventDefault()
     if (voteCounter > 0) {
@@ -456,15 +456,15 @@ function createVotingClusterUi(clusterId, topics) {
       votes.splice(votes.indexOf(clusterId), 1)
       chatSocket.send(JSON.stringify({
         type: 'setVotes',
-        votes: votes
+        votes
       }))
     }
     updateVoteCounter()
   }
 
   const voteUp = document.createElement('input')
-  voteUp.type = "button"
-  voteUp.value = "+"
+  voteUp.type = 'button'
+  voteUp.value = '+'
   voteUp.onclick = function (e) {
     e.preventDefault()
     if (votes.length < 3) {
@@ -472,7 +472,7 @@ function createVotingClusterUi(clusterId, topics) {
       votes.push(clusterId)
       chatSocket.send(JSON.stringify({
         type: 'setVotes',
-        votes: votes
+        votes
       }))
     }
     updateVoteCounter()
