@@ -7,8 +7,8 @@ from channels.generic.websocket import WebsocketConsumer
 
 
 # Keep these values in sync with the values in the html
-GROUPING_WORKSPACE_HEIGHT = 1000
-GROUPING_WORKSPACE_WIDTH = 1500
+GROUPING_WORKSPACE_HEIGHT = 800
+GROUPING_WORKSPACE_WIDTH = 1400
 
 
 @dataclass
