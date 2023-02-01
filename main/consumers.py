@@ -17,7 +17,13 @@ class Topic:
     feeling: str  # happy, sad, or confused
     x: int
     y: int
-    cluster: int
+
+
+@dataclass
+class Cluster:
+    id_: int  # only unique within a retro
+    topics: list[Topic] = field(default_factory=list)
+    votes: int = 0
 
 
 @dataclass
@@ -26,6 +32,7 @@ class Retro:
     people: list[str] = field(default_factory=list)  # names
     state: str = "joining"
     topics: list[Topic] = field(default_factory=list)
+    clusters: list[Cluster] = field(default_factory=list)
 
     def set_initial_topic_positions(self):
         for t in self.topics:
@@ -58,6 +65,7 @@ def init_msg(retro: Retro):
         "people": retro.people,
         "state": retro.state,
         "topics": [topic_dict(t) for t in retro.topics],
+        "clusters": [cluster_dict(c) for c in retro.clusters]
     }
 
 
@@ -67,9 +75,15 @@ def topic_dict(topic: Topic):
         "feeling": topic.feeling,
         "x": topic.x,
         "y": topic.y,
-        "cluster": topic.cluster,
     }
 
+
+def cluster_dict(cluster: Cluster):
+    return {
+        "id": cluster.id_,
+        "topics": [t.text for t in cluster.topics],  # TODO switch to topic ids
+        "votes": cluster.votes,
+    }
 
 # TODO Rewrite as async- https://channels.readthedocs.io/en/stable/tutorial/part_3.html#rewrite-the-consumer-to-be-asynchronous
 class ChatConsumer(WebsocketConsumer):
@@ -108,9 +122,7 @@ class ChatConsumer(WebsocketConsumer):
                 )
         elif retro.state == "brainstorming":
             if action["type"] == "addTopic":
-                topic = Topic(
-                    text=action["text"], feeling=action["list"], x=0, y=0, cluster=None
-                )
+                topic = Topic(text=action["text"], feeling=action["list"], x=0, y=0)
                 retro.topics.append(topic)
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name,
@@ -152,10 +164,9 @@ class ChatConsumer(WebsocketConsumer):
                 )
             elif action["type"] == "goToVoting":
                 next_id = 0
-                for cluster in action["clusters"]:
-                    for t in cluster:
-                        topic = retro.get_topic_by_text(t)
-                        topic.cluster = next_id
+                for ac in action["clusters"]:
+                    topics = [retro.get_topic_by_text(t) for t in ac]
+                    retro.clusters.append(Cluster(id_=next_id, topics=topics))
                     next_id += 1
                 retro.state = "voting"
                 async_to_sync(self.channel_layer.group_send)(
