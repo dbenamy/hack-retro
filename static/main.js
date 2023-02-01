@@ -51,6 +51,8 @@ chatSocket.onmessage = function (e) {
     listEl.value += (action.text + '\n')
   } else if (action.type === 'moveTopic') {
     moveTopicActionHandler(action)
+  } else if (action.type === 'updateVotes') {
+    updateVotesActionHandler(action)
   }
 }
 
@@ -402,10 +404,15 @@ function initVoting (action) {
     votingClusters.appendChild(createVotingClusterUi(cid, topicsByClusterId[cid]))
   }
 
+  const peopleDiv = document.querySelector('#voting-people')
+  // for (let person of action.people) {
+  //   const div = document.createElement('div')
+  //   div.appendChild()
+  // }
+
   document.querySelector('#voting-done').onclick = function (e) {
     chatSocket.send(JSON.stringify({
-      type: 'goToDiscussion',
-      votes: votes
+      type: 'goToDiscussion'
     }))
   }
 }
@@ -440,6 +447,10 @@ function createVotingClusterUi(clusterId, topics) {
       voteCounter--
       // Remove 1 vote for this item from the global votes list
       votes.splice(votes.indexOf(clusterId), 1)
+      chatSocket.send(JSON.stringify({
+        type: 'setVotes',
+        votes: votes
+      }))
     }
     updateVoteCounter()
   }
@@ -452,6 +463,10 @@ function createVotingClusterUi(clusterId, topics) {
     if (votes.length < 3) {
       voteCounter++
       votes.push(clusterId)
+      chatSocket.send(JSON.stringify({
+        type: 'setVotes',
+        votes: votes
+      }))
     }
     updateVoteCounter()
   }
@@ -463,4 +478,8 @@ function createVotingClusterUi(clusterId, topics) {
   table.appendChild(tr)
 
   return table
+}
+
+function updateVotesActionHandler (action) {
+
 }

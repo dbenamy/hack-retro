@@ -14,7 +14,7 @@ GROUPING_WORKSPACE_WIDTH = 1400
 @dataclass
 class Person:
     name: str
-    voted: bool = False
+    votes: list[int] = field(default_factory=list)  # cluster ids
 
 
 @dataclass
@@ -29,7 +29,6 @@ class Topic:
 class Cluster:
     id_: int  # only unique within a retro
     topics: list[Topic] = field(default_factory=list)
-    votes: int = 0
 
 
 @dataclass
@@ -78,7 +77,7 @@ def init_msg(retro: Retro):
 def people_dict(person: Person):
     return {
         "name": person.name,
-        "voted": person.voted,
+        "num_votes": len(person.votes),
     }
 
 
@@ -95,7 +94,6 @@ def cluster_dict(cluster: Cluster):
     return {
         "id": cluster.id_,
         "topics": [t.text for t in cluster.topics],  # TODO switch to topic ids
-        "votes": cluster.votes,
     }
 
 
@@ -196,6 +194,15 @@ class ChatConsumer(WebsocketConsumer):
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name, {"type": "send_init"}
                 )
+        elif retro.state == "voting":
+            if action["type"] == "setVotes":
+                self.person.votes = action["votes"]
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        "type": "update_votes",
+                    },
+                )
 
     def join(self, event):
         name = event["name"]
@@ -226,6 +233,17 @@ class ChatConsumer(WebsocketConsumer):
                     "text": event["text"],
                     "x": event["x"],
                     "y": event["y"],
+                }
+            )
+        )
+
+    def update_votes(self, event):
+        retro = get_or_create_retro(self.room_name)
+        self.send(
+            text_data=json.dumps(
+                {
+                    "type": "updateVotes",
+                    "people": [people_dict(p) for p in retro.people],
                 }
             )
         )
