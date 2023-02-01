@@ -12,6 +12,12 @@ GROUPING_WORKSPACE_WIDTH = 1400
 
 
 @dataclass
+class Person:
+    name: str
+    voted: bool = False
+
+
+@dataclass
 class Topic:
     text: str
     feeling: str  # happy, sad, or confused
@@ -29,8 +35,8 @@ class Cluster:
 @dataclass
 class Retro:
     pk: str
-    people: list[str] = field(default_factory=list)  # names
     state: str = "joining"
+    people: list[Person] = field(default_factory=list)
     topics: list[Topic] = field(default_factory=list)
     clusters: list[Cluster] = field(default_factory=list)
 
@@ -62,10 +68,17 @@ def get_or_create_retro(pk):
 def init_msg(retro: Retro):
     return {
         "type": "init",
-        "people": retro.people,
         "state": retro.state,
+        "people": [people_dict(p) for p in retro.people],
         "topics": [topic_dict(t) for t in retro.topics],
-        "clusters": [cluster_dict(c) for c in retro.clusters]
+        "clusters": [cluster_dict(c) for c in retro.clusters],
+    }
+
+
+def people_dict(person: Person):
+    return {
+        "name": person.name,
+        "voted": person.voted,
     }
 
 
@@ -85,10 +98,13 @@ def cluster_dict(cluster: Cluster):
         "votes": cluster.votes,
     }
 
+
 # TODO Rewrite as async- https://channels.readthedocs.io/en/stable/tutorial/part_3.html#rewrite-the-consumer-to-be-asynchronous
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.person = None
+
         self.room_group_name = "chat_%s" % self.room_name
 
         async_to_sync(self.channel_layer.group_add)(
@@ -108,14 +124,22 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         action = json.loads(text_data)
         retro = get_or_create_retro(self.room_name)
+
+        # TODO maybe move this into connect()
+        if action["type"] == "join":
+            # Whether or not the retro is in the initial joining stage, add them
+            # to the list of users.
+            self.person = Person(name=action["name"])
+            retro.people.append(self.person)
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name, {"type": "join", "name": self.person.name}
+            )
+            if retro.state != "joining":
+                # Send init to jump there to wherever the retro is up to.
+                self.send(text_data=json.dumps(init_msg(retro)))
+
         if retro.state == "joining":
-            if action["type"] == "join":
-                name = action["name"]
-                retro.people.append(name)
-                async_to_sync(self.channel_layer.group_send)(
-                    self.room_group_name, {"type": "join", "name": name}
-                )
-            elif action["type"] == "start":
+            if action["type"] == "start":
                 retro.state = "brainstorming"
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name, {"type": "send_init"}

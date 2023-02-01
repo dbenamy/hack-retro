@@ -1,31 +1,32 @@
+let userName = null
+
 function init (action) {
-  if (action.type !== 'init') {
-    throw new Error('init() called with non-init action.')
+  let state = action.state
+  if (!userName) {
+    state = "joining"
   }
 
   for (const div of document.querySelectorAll('.view')) {
     div.hidden = true
   }
-  const view = action.state
-  const el = document.querySelector('#' + view + '-view')
+  const el = document.querySelector('#' + state + '-view')
   if (el) {
     el.hidden = false
-    document.querySelector('#loading').hidden = true
   }
-  if (action.state === 'joining') {
-    document.querySelector('#name').focus()
+
+  if (state === 'joining') {
     for (const person of action.people) {
-      document.querySelector('#participants').value += (person + '\n')
+      document.querySelector('#participants').value += (person.name + '\n')
     }
-  } else if (action.state === 'brainstorming') {
+  } else if (state === 'brainstorming') {
     for (const topic of action.topics) {
       const listEl = document.querySelector(`#${topic.feeling}-list`)
       listEl.value += (topic.text + '\n')
     }
     document.querySelector('#happy-item').focus()
-  } else if (action.state === 'grouping') {
+  } else if (state === 'grouping') {
     initGrouping(action)
-  } else if (action.state === 'voting') {
+  } else if (state === 'voting') {
     initVoting(action)
   }
 }
@@ -67,10 +68,10 @@ document.querySelector('#name').onkeydown = function (e) {
 
 document.querySelector('#join').onclick = function (e) {
   const messageInputDom = document.querySelector('#name')
-  const name = messageInputDom.value
+  userName = messageInputDom.value
   chatSocket.send(JSON.stringify({
     type: 'join',
-    name
+    name: userName
   }))
   messageInputDom.value = ''
 }
