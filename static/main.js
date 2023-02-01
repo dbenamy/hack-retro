@@ -404,11 +404,18 @@ function initVoting (action) {
     votingClusters.appendChild(createVotingClusterUi(cid, topicsByClusterId[cid]))
   }
 
-  const peopleDiv = document.querySelector('#voting-people')
-  // for (let person of action.people) {
-  //   const div = document.createElement('div')
-  //   div.appendChild()
-  // }
+  const peopleContainer = document.querySelector('#voting-people')
+  for (const person of action.people) {
+    const div = document.createElement('div')
+    div.appendChild(document.createTextNode(person.name))
+    const span = document.createElement('span')
+    span.id = 'vote-status-' + person.name
+    span.style.margin = '5px'
+    span.style.color = 'grey'
+    div.appendChild(span)
+    peopleContainer.appendChild(div)
+  }
+  updateVoteStatuses(action.people)
 
   document.querySelector('#voting-done').onclick = function (e) {
     chatSocket.send(JSON.stringify({
@@ -480,6 +487,17 @@ function createVotingClusterUi(clusterId, topics) {
   return table
 }
 
-function updateVotesActionHandler (action) {
+function updateVoteStatuses (people) {
+  for (const person of people) {
+    const span = document.querySelector('#vote-status-' + person.name)
+    if (person.numVotes === 3) {
+      span.innerText = 'All votes in'
+    } else {
+      span.innerText = ''
+    }
+  }
+}
 
+function updateVotesActionHandler (action) {
+  updateVoteStatuses(action.people)
 }

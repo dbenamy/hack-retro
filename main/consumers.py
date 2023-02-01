@@ -77,7 +77,7 @@ def init_msg(retro: Retro):
 def people_dict(person: Person):
     return {
         "name": person.name,
-        "num_votes": len(person.votes),
+        "numVotes": len(person.votes),
     }
 
 
