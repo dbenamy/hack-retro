@@ -59,7 +59,7 @@ chatSocket.onclose = function (e) {
 
 // Handlers for the joining view
 
-document.querySelector('#name').onkeyup = function (e) {
+document.querySelector('#name').onkeydown = function (e) {
   if (e.keyCode === 13) { // enter, return
     document.querySelector('#join').click()
   }
@@ -83,7 +83,7 @@ document.querySelector('#start').onclick = function (e) {
 
 // Handlers for the brainstorming view
 
-document.querySelector('#happy-item').onkeyup = function (e) {
+document.querySelector('#happy-item').onkeydown = function (e) {
   if (e.keyCode === 13) { // enter, return
     document.querySelector('#happy-add').click()
   }
@@ -100,7 +100,7 @@ document.querySelector('#happy-add').onclick = function (e) {
   inputEl.value = ''
 }
 
-document.querySelector('#sad-item').onkeyup = function (e) {
+document.querySelector('#sad-item').onkeydown = function (e) {
   if (e.keyCode === 13) { // enter, return
     document.querySelector('#sad-add').click()
   }
@@ -117,7 +117,7 @@ document.querySelector('#sad-add').onclick = function (e) {
   inputEl.value = ''
 }
 
-document.querySelector('#confused-item').onkeyup = function (e) {
+document.querySelector('#confused-item').onkeydown = function (e) {
   if (e.keyCode === 13) { // enter, return
     document.querySelector('#confused-add').click()
   }
