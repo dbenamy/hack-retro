@@ -22,6 +22,7 @@ function init (action) {
       const listEl = document.querySelector(`#${topic.feeling}-list`)
       listEl.value += (topic.text + '\n')
     }
+    document.querySelector('#happy-item').focus()
   } else if (action.state === 'grouping') {
     initGrouping(action)
   } else if (action.state === 'voting') {
