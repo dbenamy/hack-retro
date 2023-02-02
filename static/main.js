@@ -148,6 +148,13 @@ document.querySelector('#go-to-grouping').onclick = function (e) {
 // Grouping view code
 
 const workspace = document.querySelector('#grouping-workspace')
+// TODO workspaceCoords is winding up with 0,0 when what this is trying to
+// represent is the coords of the workspace in page-space, ie taking into
+// account the margin and/or padding on the top and left of the workspace. I
+// think this means that the coords that the server is working with, are in the
+// coordinate system of the page rather than the workspace. This might cause
+// hopefully-slight positioning bugs when users with different browsers do a
+// retro together if their workspaces have different margin/padding.
 const workspaceCoords = getCoords(workspace)
 
 const divsByTopic = {}
@@ -171,10 +178,14 @@ function initGrouping (action) {
   }
 }
 
-// TODO give credit to SO answer where I got this.
-function getCoords (elem) { // crossbrowser version
+function getCoords (elem) {
   const box = elem.getBoundingClientRect()
+  return screenToPageCoords(box.left, box.top)
+}
 
+// TODO give credit to SO answer where I got this.
+// crossbrowser version
+function screenToPageCoords (left, top) {
   const body = document.body
   const docEl = document.documentElement
 
@@ -184,10 +195,10 @@ function getCoords (elem) { // crossbrowser version
   const clientTop = docEl.clientTop || body.clientTop || 0
   const clientLeft = docEl.clientLeft || body.clientLeft || 0
 
-  const top = box.top + scrollTop - clientTop
-  const left = box.left + scrollLeft - clientLeft
+  const top2 = top + scrollTop - clientTop
+  const left2 = left + scrollLeft - clientLeft
 
-  return { top: Math.round(top), left: Math.round(left) }
+  return { left: Math.round(left2), top: Math.round(top2) }
 }
 
 let beingDragged = null
@@ -288,15 +299,22 @@ function dragoverHandler (event) {
   event.preventDefault()
 
   const screenX = (event.x - mouseXOffset)
-  beingDragged.style.left = screenX + 'px'
   const screenY = (event.y - mouseYOffset)
-  beingDragged.style.top = screenY + 'px'
+  const pageCoords = screenToPageCoords(screenX, screenY)
+  // console.log(`event coords: ${event.x}, ${event.y}`)
+  // console.log(`screen coords: ${screenX}, ${screenY}`)
+  // console.log(`page coords: ${pageCoords.left}, ${pageCoords.top}`)
+  beingDragged.style.left = pageCoords.left + 'px'
+  beingDragged.style.top = pageCoords.top + 'px'
 
   updateClustering(beingDragged)
 
   const topic = beingDragged.textContent
-  const x = screenX - workspaceCoords.left
-  const y = screenY - workspaceCoords.top
+  const x = pageCoords.left - workspaceCoords.left
+  const y = pageCoords.top - workspaceCoords.top
+  // console.log(`workspaceCoords:`)
+  // console.log(workspaceCoords)
+  // console.log(`server coords: ${x}, ${y}`)
   debouncedSendTopicPosition(topic, x, y) // TODO we may want to use some kind of id rather than the topic string
 }
 
@@ -347,10 +365,11 @@ function dropHandler (event) {
 
   updateClustering(beingDragged)
 
-  const x = (event.x - mouseXOffset)
-  const y = (event.y - mouseYOffset)
+  const screenX = (event.x - mouseXOffset)
+  const screenY = (event.y - mouseYOffset)
+  const pageCoords = screenToPageCoords(screenX, screenY)
   const topic = beingDragged.textContent
-  sendTopicPosition(topic, x, y) // TODO we may want to use some kind of id rather than the topic string
+  sendTopicPosition(topic, pageCoords.left, pageCoords.top) // TODO we may want to use some kind of id rather than the topic string
 
   beingDragged = null
 }
