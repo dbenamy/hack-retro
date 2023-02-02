@@ -29,6 +29,7 @@ class Topic:
 class Cluster:
     id_: int  # only unique within a retro
     topics: list[Topic] = field(default_factory=list)
+    votes: int = 0
 
 
 @dataclass
@@ -51,6 +52,16 @@ class Retro:
             if t.text == text:
                 return t
         raise Exception("No such topic")
+
+    def tally_votes(self) -> None:
+        clusters_by_id = {}
+        for c in self.clusters:
+            c.votes = 0
+            clusters_by_id[c.id_] = c
+        for p in self.people:
+            for v in p.votes:
+                c = clusters_by_id[v]
+                c.votes += 1
 
 
 # TODO gc old ones
@@ -94,6 +105,7 @@ def cluster_dict(cluster: Cluster):
     return {
         "id": cluster.id_,
         "topics": [t.text for t in cluster.topics],  # TODO switch to topic ids
+        "votes": cluster.votes,
     }
 
 
@@ -196,12 +208,18 @@ class ChatConsumer(WebsocketConsumer):
                 )
         elif retro.state == "voting":
             if action["type"] == "setVotes":
-                self.person.votes = action["votes"]
+                self.person.votes = [int(v) for v in action["votes"]]
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name,
                     {
                         "type": "update_votes",
                     },
+                )
+            elif action["type"] == "goToDiscussion":
+                retro.tally_votes()
+                retro.state = "discussion"
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name, {"type": "send_init"}
                 )
 
     def join(self, event):
