@@ -112,12 +112,12 @@ def cluster_dict(cluster: Cluster):
 
 
 # TODO Rewrite as async- https://channels.readthedocs.io/en/stable/tutorial/part_3.html#rewrite-the-consumer-to-be-asynchronous
-class ChatConsumer(WebsocketConsumer):
+class RetroConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.person = None
 
-        self.room_group_name = "chat_%s" % self.room_name
+        self.room_group_name = "retro_%s" % self.room_name
 
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name

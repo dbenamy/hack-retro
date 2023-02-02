@@ -36,11 +36,11 @@ function init (action) {
 // const retroId = JSON.parse(document.getElementById('room-name').textContent);
 const retroId = 'abdce'
 
-const chatSocket = new WebSocket(
-  'ws://' + window.location.host + '/ws/chat/' + retroId + '/'
+const ws = new WebSocket(
+  'ws://' + window.location.host + '/ws/retro/' + retroId + '/'
 )
 
-chatSocket.onmessage = function (e) {
+ws.onmessage = function (e) {
   const action = JSON.parse(e.data)
   console.log('Got action from server:')
   console.log(action)
@@ -58,7 +58,7 @@ chatSocket.onmessage = function (e) {
   }
 }
 
-chatSocket.onclose = function (e) {
+ws.onclose = function (e) {
   console.error('Chat socket closed unexpectedly')
 }
 
@@ -73,7 +73,7 @@ document.querySelector('#name').onkeydown = function (e) {
 document.querySelector('#join').onclick = function (e) {
   const messageInputDom = document.querySelector('#name')
   userName = messageInputDom.value
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'join',
     name: userName
   }))
@@ -81,7 +81,7 @@ document.querySelector('#join').onclick = function (e) {
 }
 
 document.querySelector('#start').onclick = function (e) {
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'start'
   }))
 }
@@ -97,7 +97,7 @@ document.querySelector('#happy-item').onkeydown = function (e) {
 document.querySelector('#happy-add').onclick = function (e) {
   const inputEl = document.querySelector('#happy-item')
   const text = inputEl.value
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'addTopic',
     list: 'happy',
     text
@@ -114,7 +114,7 @@ document.querySelector('#sad-item').onkeydown = function (e) {
 document.querySelector('#sad-add').onclick = function (e) {
   const inputEl = document.querySelector('#sad-item')
   const text = inputEl.value
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'addTopic',
     list: 'sad',
     text
@@ -131,7 +131,7 @@ document.querySelector('#confused-item').onkeydown = function (e) {
 document.querySelector('#confused-add').onclick = function (e) {
   const inputEl = document.querySelector('#confused-item')
   const text = inputEl.value
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'addTopic',
     list: 'confused',
     text
@@ -140,7 +140,7 @@ document.querySelector('#confused-add').onclick = function (e) {
 }
 
 document.querySelector('#go-to-grouping').onclick = function (e) {
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'goToGrouping'
   }))
 }
@@ -301,7 +301,7 @@ function dragoverHandler (event) {
 }
 
 function sendTopicPosition (topic, x, y) {
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'moveTopic',
     text: topic,
     x,
@@ -358,7 +358,7 @@ function dropHandler (event) {
 document.querySelector('#go-to-voting').onclick = function (e) {
   assignAllTopicsACluster()
   const topicsByCluster = getTopicByCluster(clustersByTopic)
-  chatSocket.send(JSON.stringify({
+  ws.send(JSON.stringify({
     type: 'goToVoting',
     clusters: Object.values(topicsByCluster)
   }))
@@ -420,7 +420,7 @@ function initVoting (action) {
   updateVoteStatuses(action.people)
 
   document.querySelector('#voting-done').onclick = function (e) {
-    chatSocket.send(JSON.stringify({
+    ws.send(JSON.stringify({
       type: 'goToDiscussion'
     }))
   }
@@ -456,7 +456,7 @@ function createVotingClusterUi (clusterId, topics) {
       voteCounter--
       // Remove 1 vote for this item from the global votes list
       votes.splice(votes.indexOf(clusterId), 1)
-      chatSocket.send(JSON.stringify({
+      ws.send(JSON.stringify({
         type: 'setVotes',
         votes
       }))
@@ -472,7 +472,7 @@ function createVotingClusterUi (clusterId, topics) {
     if (votes.length < 3) {
       voteCounter++
       votes.push(clusterId)
-      chatSocket.send(JSON.stringify({
+      ws.send(JSON.stringify({
         type: 'setVotes',
         votes
       }))
@@ -520,7 +520,7 @@ function initDiscussion (initAction) {
   }
   document.querySelector('#discussion-add-action').onclick = function (e) {
     const input = document.querySelector('#discussion-action-text')
-    chatSocket.send(JSON.stringify({
+    ws.send(JSON.stringify({
       type: 'addAction',
       text: input.value
     }))
