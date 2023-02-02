@@ -219,6 +219,7 @@ class ChatConsumer(WebsocketConsumer):
                 )
             elif action["type"] == "goToDiscussion":
                 retro.tally_votes()
+                retro.clusters.sort(key=lambda c: c.votes, reverse=True)
                 retro.state = "discussion"
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name, {"type": "send_init"}
