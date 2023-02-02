@@ -28,6 +28,8 @@ function init (action) {
     initGrouping(action)
   } else if (state === 'voting') {
     initVoting(action)
+  } else if (state === 'discussion') {
+    initDiscussion(action)
   }
 }
 
@@ -500,4 +502,67 @@ function updateVoteStatuses (people) {
 
 function updateVotesActionHandler (action) {
   updateVoteStatuses(action.people)
+}
+
+// Discussion view
+
+function initDiscussion (initAction) {
+  const clustersContainer = document.querySelector('#discussion-clusters')
+  clustersContainer.innerHTML = ''
+  for (const c of initAction.clusters) {
+    clustersContainer.appendChild(createDiscussionClusterUi(c))
+  }
+
+  document.querySelector('#discussion-action-text').onkeydown = function (e) {
+    if (e.keyCode === 13) { // enter, return
+      document.querySelector('#discussion-add-action').click()
+    }
+  }
+  document.querySelector('#discussion-add-action').onclick = function (e) {
+    const input = document.querySelector('#discussion-action-text')
+    chatSocket.send(JSON.stringify({
+      type: 'addAction',
+      text: input.value
+    }))
+    input.value = ''
+  }
+
+  const actionsContainer = document.querySelector('#discussion-actions')
+  actionsContainer.innerHTML = '<h3>Action Items</h3>'
+  const ul = document.createElement('ul')
+  ul.style.cssText = 'padding-inline-start: 15px;'
+  for (const a of initAction.actions) {
+    const li = document.createElement('li')
+    li.innerText = a
+    ul.appendChild(li)
+  }
+  actionsContainer.appendChild(ul)
+}
+
+function createDiscussionClusterUi (cluster) {
+  const table = document.createElement('table')
+  table.style.cssText = 'border: 2px solid black; margin: 5px; border-collapse: collapse; display: inline-block; vertical-align: top;'
+
+  const tr = document.createElement('tr')
+  const voteCountView = document.createElement('span')
+  voteCountView.style.margin = '3px'
+  if (cluster.votes === 1) {
+    voteCountView.innerText = '1 vote'
+  } else {
+    voteCountView.innerText = `${cluster.votes} votes`
+  }
+  tr.appendChild(voteCountView)
+  table.appendChild(tr)
+
+  console.log(cluster.topics)
+  for (const t of cluster.topics) {
+    console.log(t)
+    const tr = document.createElement('tr')
+    tr.style.cssText = 'border: 1px solid black'
+    const textEl = document.createTextNode(t)
+    tr.appendChild(textEl)
+    table.appendChild(tr)
+  }
+
+  return table
 }

@@ -61,6 +61,25 @@
         <div id="voting-people"></div>
         <input id="voting-done" type="button" value="Done">
     </div>
+    <div class="view" id="discussion-view" hidden=true>
+        <table style="width: 100%">
+            <colgroup>
+               <col span="1" style="width: 80%;">
+               <col span="1" style="width: 20%;">
+            </colgroup>
+            <tr>
+                <td style="text-align: left; vertical-align: top;"><div id="discussion-clusters"></div></td>
+                <td>
+                    <div id="discussion-actions"></div>
+                    <textarea id="discussion-action-text" placeholder="New action" cols="50" rows="3"></textarea>
+                    <input id="discussion-add-action" type="button" value="Add">
+                </td>
+            </tr>
+        </table>
+
+        <div> <!-- style="display: flex; flex-direction: column"> -->
+        </div>
+    </div>
 </body>
 <script src="/static/main.js"></script>
 </html>

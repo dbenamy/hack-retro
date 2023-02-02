@@ -39,6 +39,7 @@ class Retro:
     people: list[Person] = field(default_factory=list)
     topics: list[Topic] = field(default_factory=list)
     clusters: list[Cluster] = field(default_factory=list)
+    actions: list[str] = field(default_factory=list)
 
     def set_initial_topic_positions(self):
         for t in self.topics:
@@ -82,6 +83,7 @@ def init_msg(retro: Retro):
         "people": [people_dict(p) for p in retro.people],
         "topics": [topic_dict(t) for t in retro.topics],
         "clusters": [cluster_dict(c) for c in retro.clusters],
+        "actions": retro.actions,
     }
 
 
@@ -218,6 +220,13 @@ class ChatConsumer(WebsocketConsumer):
             elif action["type"] == "goToDiscussion":
                 retro.tally_votes()
                 retro.state = "discussion"
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name, {"type": "send_init"}
+                )
+        elif retro.state == "discussion":
+            if action["type"] == "addAction":
+                retro.actions.append(action["text"])
+                # Kind of a hack but just re-init
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name, {"type": "send_init"}
                 )
