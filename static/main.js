@@ -1,4 +1,33 @@
+// Pull the uuid out of the url like http://foo/retros/<uuid>
+const retroId = window.location.pathname.split('/')[2]
+
 let userName = null
+
+const ws = new WebSocket(
+  'ws://' + window.location.host + '/ws/retro/' + retroId + '/'
+)
+
+ws.onmessage = function (e) {
+  const action = JSON.parse(e.data)
+  console.log('Got action from server:')
+  console.log(action)
+  if (action.type === 'init') {
+    init(action)
+  } else if (action.type === 'join') {
+    document.querySelector('#participants').value += (action.name + '\n')
+  } else if (action.type === 'addTopic') {
+    const listEl = document.querySelector('#' + action.list + '-list')
+    listEl.value += (action.text + '\n')
+  } else if (action.type === 'moveTopic') {
+    moveTopicActionHandler(action)
+  } else if (action.type === 'updateVotes') {
+    updateVotesActionHandler(action)
+  }
+}
+
+ws.onclose = function (e) {
+  console.error('Chat socket closed unexpectedly')
+}
 
 function init (action) {
   let state = action.state
@@ -31,35 +60,6 @@ function init (action) {
   } else if (state === 'discussion') {
     initDiscussion(action)
   }
-}
-
-// Pull the uuid out of the url like http://foo/retros/<uuid>
-const retroId = window.location.pathname.split('/')[2]
-
-const ws = new WebSocket(
-  'ws://' + window.location.host + '/ws/retro/' + retroId + '/'
-)
-
-ws.onmessage = function (e) {
-  const action = JSON.parse(e.data)
-  console.log('Got action from server:')
-  console.log(action)
-  if (action.type === 'init') {
-    init(action)
-  } else if (action.type === 'join') {
-    document.querySelector('#participants').value += (action.name + '\n')
-  } else if (action.type === 'addTopic') {
-    const listEl = document.querySelector('#' + action.list + '-list')
-    listEl.value += (action.text + '\n')
-  } else if (action.type === 'moveTopic') {
-    moveTopicActionHandler(action)
-  } else if (action.type === 'updateVotes') {
-    updateVotesActionHandler(action)
-  }
-}
-
-ws.onclose = function (e) {
-  console.error('Chat socket closed unexpectedly')
 }
 
 // Handlers for the joining view
