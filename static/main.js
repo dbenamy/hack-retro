@@ -33,8 +33,7 @@ function init (action) {
   }
 }
 
-// const retroId = JSON.parse(document.getElementById('room-name').textContent);
-const retroId = 'abdce'
+const retroId = '3664D02D-EB72-4900-B42A-6B7D6F25C21D'
 
 const ws = new WebSocket(
   'ws://' + window.location.host + '/ws/retro/' + retroId + '/'
@@ -528,6 +527,7 @@ function updateVotesActionHandler (action) {
 function initDiscussion (initAction) {
   const clustersContainer = document.querySelector('#discussion-clusters')
   clustersContainer.innerHTML = ''
+  initAction.clusters.sort((a, b) => b.votes - a.votes)
   for (const c of initAction.clusters) {
     clustersContainer.appendChild(createDiscussionClusterUi(c))
   }
