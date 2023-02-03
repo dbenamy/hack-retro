@@ -574,9 +574,7 @@ function createDiscussionClusterUi (cluster) {
   tr.appendChild(voteCountView)
   table.appendChild(tr)
 
-  console.log(cluster.topics)
   for (const t of cluster.topics) {
-    console.log(t)
     const tr = document.createElement('tr')
     tr.style.cssText = 'border: 1px solid black'
     const textEl = document.createTextNode(t)
