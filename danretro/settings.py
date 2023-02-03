@@ -10,22 +10,39 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+RETRO_ENV = os.getenv("RETRO_ENV")
+DEV = "dev"
+PROD = "prod"
+if RETRO_ENV not in [DEV, PROD]:
+    raise Exception("You must set env var RETRO_ENV to dev or prod")
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-($_3vvas61+yr+572t#u51&yi#&y!h+5blj$l-umr&%(572db9"
+if RETRO_ENV == DEV:
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = "django-insecure-($_3vvas61+yr+572t#u51&yi#&y!h+5blj$l-umr&%(572db9"
+elif RETRO_ENV == PROD:
+    SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = RETRO_ENV == DEV
 
-ALLOWED_HOSTS: list[str] = []
+if RETRO_ENV == DEV:
+    ALLOWED_HOSTS: list[str] = []
+elif RETRO_ENV == PROD:
+    ALLOWED_HOSTS: list[str] = ["*"]
 
 
 # Application definition
@@ -76,12 +93,20 @@ WSGI_APPLICATION = "danretro.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if RETRO_ENV == DEV:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+elif RETRO_ENV == PROD:
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+        ),
+    }
 
 
 # Password validation

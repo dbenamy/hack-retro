@@ -9,8 +9,8 @@ If you want something reasonable in the same vein, check out https://remoteretro
 
 ```sh
 poetry install
-poetry run ./manage.py migrate
-poetry run ./manage.py runserver
+env RETRO_ENV=dev poetry run ./manage.py migrate
+env RETRO_ENV=dev poetry run ./manage.py runserver
 ```
 
 Run checks. TODO put in ci.
