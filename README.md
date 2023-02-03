@@ -9,7 +9,8 @@ If you want something reasonable in the same vein, check out https://remoteretro
 
 ```sh
 poetry install
-poetry run uvicorn --reload danretro.asgi:application
+poetry run ./manage.py migrate
+poetry run ./manage.py runserver
 ```
 
 Run checks. TODO put in ci.

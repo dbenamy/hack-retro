@@ -31,6 +31,7 @@ ALLOWED_HOSTS: list[str] = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -138,3 +139,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # sure if there are other reasons why it'd be a bad idea to use in (small) prod.
 # TODO Do something better later on.
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+
+ASGI_APPLICATION = "danretro.asgi.application"

@@ -18,7 +18,6 @@ import main.routing
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "danretro.settings")
 
-# application = get_asgi_application()
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
