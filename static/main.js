@@ -33,7 +33,8 @@ function init (action) {
   }
 }
 
-const retroId = '3664D02D-EB72-4900-B42A-6B7D6F25C21D'
+// Pull the uuid out of the url like http://foo/retros/<uuid>
+const retroId = window.location.pathname.split('/')[2]
 
 const ws = new WebSocket(
   'ws://' + window.location.host + '/ws/retro/' + retroId + '/'

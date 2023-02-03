@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Hack Retro</title>
+</head>
+<body>
+	<h1>Hack Retro</h1>
+	<form action="/retros/" method="post">
+		{% csrf_token %}
+		<input type="submit" value="Create Retro">
+	</form>
+</body>
+</html>

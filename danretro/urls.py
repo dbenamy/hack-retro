@@ -21,5 +21,7 @@ from main import views
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path("", views.index),
+    path("retros/", views.retros, {"id": None}),
+    path("retros/<str:id>", views.retros),
     path("static/<str:path>", views.static),
 ]

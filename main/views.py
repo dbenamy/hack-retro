@@ -1,13 +1,23 @@
 import os.path
 
-from django.shortcuts import render
-from django.http import HttpResponse
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.views.static import serve
+
+from main.models import Retro
 
 
 def index(request):
-    return static(request, "index.html")
+    return render(request, "index.html")
+
+
+def retros(request, id):
+    if request.method == "POST":
+        r = Retro.objects.create()
+        return HttpResponseRedirect(f"/retros/{r.uuid}")
+    get_object_or_404(Retro, uuid=id)  # just make sure it exists
+    return static(request, "retro.html")
 
 
 def static(request, path):
