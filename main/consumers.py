@@ -44,9 +44,7 @@ def cluster_dict(cluster: Cluster):
 # TODO Rewrite as async- https://channels.readthedocs.io/en/stable/tutorial/part_3.html#rewrite-the-consumer-to-be-asynchronous
 class RetroConsumer(WebsocketConsumer):
     def connect(self):
-        self.retro_uuid = self.scope["url_route"]["kwargs"][
-            "room_name"
-        ]  # TODO update param name
+        self.retro_uuid = self.scope["url_route"]["kwargs"]["retro_id"]
         self.person_name = None
 
         self.channel_group_name = "retro_%s" % self.retro_uuid
