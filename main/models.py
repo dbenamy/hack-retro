@@ -18,6 +18,7 @@ class Retro(models.Model):
             # TODO prevent overlap with the edge of the workspace
             t.x = randint(0, GROUPING_WORKSPACE_WIDTH)
             t.y = randint(0, GROUPING_WORKSPACE_HEIGHT)
+            t.save()
 
     def tally_votes_and_save(self) -> None:
         clusters_by_id = {}
